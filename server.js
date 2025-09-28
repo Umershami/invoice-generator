@@ -14,9 +14,13 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:5173",  // ✅ Vite frontend ka address
-  credentials: true                
+  origin: [
+    "http://localhost:5173", 
+    "https://effortless-sunshine-10f1fc.netlify.app"
+  ],  
+  credentials: true
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
