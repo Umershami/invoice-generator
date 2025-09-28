@@ -1,0 +1,17 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Login Users"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "tccumer@gmail.com"
+            password: "Umer123"
