@@ -1,6 +1,6 @@
 // backend/routes/authRoutes.js
 import express from "express";
-import { signup, login,forgotPassword,resetPassword } from "../controllers/authController.js";
+import { signup, login, forgotPassword, resetPassword, logout } from "../controllers/authController.js";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 
@@ -9,7 +9,8 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/forgot-password", forgotPassword);
-router.post("/reset-password/:token", resetPassword)
+router.post("/reset-password/:token", resetPassword);
+router.post("/logout", logout);
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -25,6 +26,14 @@ router.get(
     try {
       const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
         expiresIn: "7d",
+      });
+
+      // ✅ Set cookie for Google OAuth users too
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
       // ✅ Send to frontend with token

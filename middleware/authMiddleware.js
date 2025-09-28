@@ -2,7 +2,9 @@
 import jwt from "jsonwebtoken";
 
 export const protect = (req, res, next) => {
-  let token = req.headers.authorization?.split(" ")[1];
+  // ✅ Check for token in Authorization header first, then in cookies
+  let token = req.headers.authorization?.split(" ")[1] || req.cookies?.token;
+  
   if (!token) {
     return res.status(401).json({ message: "No token, authorization denied" });
   }

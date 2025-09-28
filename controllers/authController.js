@@ -21,6 +21,14 @@ export const signup = async (req, res) => {
       expiresIn: "1d",
     });
 
+    // ✅ Send token via cookie with security options
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true for HTTPS in production
+      sameSite: "None", // For cross-origin requests
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+    });
+
     res.status(201).json({ token });
   } catch (error) {
     console.error("❌ Signup error:", error);
@@ -40,6 +48,14 @@ export const login = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
+    });
+
+    // ✅ Send token via cookie with security options
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true for HTTPS in production
+      sameSite: "None", // For cross-origin requests
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
     });
 
     res.json({ token });
@@ -125,6 +141,23 @@ export const resetPassword = async (req, res) => {
     res.json({ message: "Password reset successful" });
   } catch (err) {
     console.error("❌ Reset password error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ✅ Logout function to clear cookie
+export const logout = async (req, res) => {
+  try {
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      expires: new Date(0), // Expire immediately
+    });
+
+    res.json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error("❌ Logout error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
