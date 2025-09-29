@@ -1,17 +1,20 @@
 import dotenv from "dotenv";
-dotenv.config(); // ✅ make sure .env is loaded here too
+dotenv.config(); // ✅ Load env first
 
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/User.js";
-
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:5000/api/auth/google/callback",
+      // ✅ Use env variable for callbackURL
+      callbackURL:
+        process.env.NODE_ENV === "production"
+          ? `${process.env.SERVER_URL}/api/auth/google/callback`
+          : "http://localhost:5000/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
